@@ -314,15 +314,15 @@ function validateForm() {
   } else if (!/^\d+$/.test(age)) {
     document.getElementById('patientAge').classList.add('invalid');
     document.getElementById('patientAgeError').textContent =
-      'La edad debe ser numérica';
+      'La edad no debe contener simbolos';
     valid = false;
 
-  } else if (parseInt(age, 10) <= 0 || parseInt(age, 10) > 120) {
+  } else if (parseInt(age, 10) <= 0 || parseInt(age, 10) > 100) {
     document.getElementById('patientAge').classList.add('invalid');
     document.getElementById('patientAgeError').textContent =
-      'Ingrese una edad válida mayor a 0';
+      'Ingrese una edad válida mayor a 0 y menor o igual a 100';
     valid = false;
-  }
+  } 
 
   // ===== Enfermera =====
   if (!nurse) {
