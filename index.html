@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <style>
+    body {
+      background: #0a1628;
+      margin: 0;
+      opacity: 0;
+    }
+  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor de Índice Bispectral</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <img src="/LogoNurse.jpeg" alt="Logo BIS" />
+      </div>
+      <h1 class="app-title">NurseDepth Advanced Tecnología y cuidado en sedación clínica</h1>
+      <div class="header-icon right-logo">
+        <img src="/LogoNurse.jpeg" alt="Logo BIS" />
+      </div>
+    </div>
+  </header>
+
+
+
+  <main class="main-content">
+
+
+
+
+    <!-- SCREEN 1: Home -->
+    <section id="screenHome" class="screen">
+      <div class="hero-card">
+        <p class="hero-subtitle">Registro y seguimiento de monitoreo BIS durante procedimientos anestésicos</p>
+        <button id="startBtn" class="btn-start" aria-label="Empezar nuevo registro">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          Empezar
+        </button>
+      </div>
+
+      <div class="history-section">
+        <div class="section-header">
+          <h2 class="section-title">Historial</h2>
+          <span class="record-count" id="recordCount">0 registros</span>
+        </div>
+        <div id="historyList" class="history-list">
+          <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p>No hay registros aún</p>
+            <span>Presiona "Empezar" para crear el primer registro</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: Form -->
+    <section id="screenForm" class="screen hidden">
+      <div class="form-card">
+        <h2 class="form-heading">Datos del Paciente</h2>
+        <form id="patientForm" novalidate>
+          <div class="form-group">
+            <label for="patientName" class="form-label">Nombre del paciente *</label>
+            <input type="text" id="patientName" class="form-input" placeholder="Ej. María García López"
+              autocomplete="off" required />
+            <span class="field-error" id="patientNameError"></span>
+          </div>
+          <div class="form-group">
+            <label for="patientAge" class="form-label">Edad *</label>
+            <input type="number" id="patientAge" class="form-input" placeholder="Ej. 45" min="0" max="120" required />
+            <span class="field-error" id="patientAgeError"></span>
+          </div>
+          <div class="form-group">
+            <label for="nurseName" class="form-label">Nombre de la enfermera *</label>
+            <input type="text" id="nurseName" class="form-input" placeholder="Ej. Enf. Carlos Medina" autocomplete="off"
+              required />
+            <span class="field-error" id="nurseNameError"></span>
+          </div>
+          <div class="form-actions">
+            <button type="button" id="formBackBtn" class="btn-secondary">Volver</button>
+            <button type="submit" class="btn-primary">Continuar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: Dashboard with slider -->
+    <section id="screenDashboard" class="screen hidden">
+      <div class="monitor-card">
+        <h2 class="monitor-title">Monitor de Índice Bispectral</h2>
+        <div class="monitor-patient-info">
+          <div class="info-row">
+            <span class="info-label">Paciente</span>
+            <span class="info-value" id="dashPatient">–</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Edad</span>
+            <span class="info-value" id="dashAge">–</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Enfermera</span>
+            <span class="info-value" id="dashNurse">–</span>
+          </div>
+        </div>
+
+        <div class="monitor-display">
+          <div class="bis-value" id="bisValue">0</div>
+          <div class="bis-status" id="bisStatus">–</div>
+        </div>
+
+        <div class="slider-section">
+
+          <div class="slider-track-wrapper">
+
+            <div class="slider-ticks">
+              <span class="tick-primary"></span>
+              <span class="tick-primary"></span>
+
+              <span class="tick-teal"></span>
+              <span class="tick-warning"></span>
+
+              <span class="tick-error"></span>
+
+              <span class="tick-error"></span>
+            </div>
+
+            <input type="range" id="bisSlider" class="bis-slider" min="0" max="100" value="0" step="1" />
+
+          </div>
+
+          <div class="slider-labels">
+            <span>0</span>
+            <span>20</span>
+            <span>40</span>
+            <span>60</span>
+            <span>80</span>
+            <span>100</span>
+          </div>
+
+        </div>
+
+        <div class="monitor-actions">
+          <button id="dashBackBtn" class="btn-secondary">Volver</button>
+          <button id="startTestBtn" class="btn-primary btn-test">Comenzar prueba</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: Quiz -->
+    <section id="screenQuiz" class="screen hidden">
+      <div class="monitor-card">
+        <h2 class="quiz-title">¡Pon a prueba tus conocimientos!</h2>
+        <div class="monitor-patient-info">
+          <div class="info-row">
+            <span class="info-label">Paciente</span>
+            <span class="info-value" id="quizPatient">–</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Edad</span>
+            <span class="info-value" id="quizAge">–</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Enfermera</span>
+            <span class="info-value" id="quizNurse">–</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ronda</span>
+            <span class="info-value" id="quizRound">1 / 3</span>
+          </div>
+        </div>
+
+        <div class="monitor-display">
+          <div class="bis-value" id="quizBisValue">0</div>
+          <div class="bis-status" id="quizBisStatus">–</div>
+        </div>
+
+        <div class="quiz-options">
+          <p class="quiz-prompt">¿Cuál es el estado BIS correcto?</p>
+          <div class="quiz-buttons">
+            <button class="quiz-btn" data-answer="awake">Despierto</button>
+            <button class="quiz-btn" data-answer="light">Sedación</button>
+            <button class="quiz-btn" data-answer="anesthesia">Anestesia adecuada</button>
+            <button class="quiz-btn" data-answer="deep">Anestesia profunda</button>
+          </div>
+        </div>
+
+        <div class="quiz-feedback hidden" id="quizFeedback">
+          <div class="feedback-icon" id="feedbackIcon"></div>
+          <p class="feedback-text" id="feedbackText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: Results -->
+    <section id="screenResults" class="screen hidden">
+      <div class="results-card">
+        <div class="results-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4" />
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+        </div>
+        <h2 class="results-heading">Gracias por ingresar a la aplicación</h2>
+        <div class="results-score" id="resultsScore">0 / 3</div>
+        <p class="results-label" id="resultsLabel">aciertos</p>
+        <div class="results-detail" id="resultsDetail"></div>
+        <div class="results-actions">
+          <button id="backHomeBtn" class="btn-primary btn-home">Volver a inicio</button>
+        </div>
+        <p class="results-timer" id="resultsTimer">Regresando al inicio en 20s...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
