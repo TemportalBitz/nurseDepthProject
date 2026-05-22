@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pkg from 'pg';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const { Pool } = pkg;
@@ -11,9 +12,7 @@ const { Pool } = pkg;
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-/* =========================
-   MIDDLEWARE
-========================= */
+
 
 app.use(cors());
 app.use(express.json());
@@ -26,19 +25,32 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* =========================
-   NEON / POSTGRES CONNECTION
+   POOL CONFIG
 ========================= */
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false },
+  max: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000
 });
 
-pool.connect()
-  .then(() => console.log('NeonDB conectado correctamente'))
-  .catch(err => console.error('Error conectando NeonDB:', err));
+/* =========================
+   EVENTS
+========================= */
+
+pool.on('error', (err) => {
+  console.error('❌ Error inesperado en PostgreSQL pool:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('❌ UNHANDLED REJECTION:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ UNCAUGHT EXCEPTION:', err);
+});
 
 /* =========================
    CREAR TABLA
@@ -58,16 +70,14 @@ const initDB = async () => {
       )
     `);
 
-    console.log('Tabla verificada correctamente');
+    console.log('✔ Tabla verificada correctamente');
   } catch (err) {
-    console.error('Error creando tabla:', err);
+    console.error('❌ Error creando tabla:', err);
   }
 };
 
-initDB();
-
 /* =========================
-   OBTENER REGISTROS
+   API
 ========================= */
 
 app.get('/api/records', async (req, res) => {
@@ -78,14 +88,10 @@ app.get('/api/records', async (req, res) => {
 
     res.json(result.rows);
   } catch (err) {
-    console.error('Error obteniendo registros:', err);
+    console.error('❌ Error obteniendo registros:', err);
     res.status(500).json({ error: err.message });
   }
 });
-
-/* =========================
-   GUARDAR REGISTRO
-========================= */
 
 app.post('/api/records', async (req, res) => {
   const {
@@ -104,26 +110,15 @@ app.post('/api/records', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
       `,
-      [
-        patient_name,
-        edad,
-        nurse_name,
-        score,
-        aciertos
-      ]
+      [patient_name, edad, nurse_name, score, aciertos]
     );
 
     res.json(result.rows[0]);
-
   } catch (err) {
-    console.error('Error insertando registro:', err);
+    console.error('❌ Error insertando registro:', err);
     res.status(500).json({ error: err.message });
   }
 });
-
-/* =========================
-   ELIMINAR REGISTRO
-========================= */
 
 app.delete('/api/records/:id', async (req, res) => {
   const { id } = req.params;
@@ -135,15 +130,14 @@ app.delete('/api/records/:id', async (req, res) => {
     );
 
     res.json({ success: true });
-
   } catch (err) {
-    console.error('Error eliminando registro:', err);
+    console.error('❌ Error eliminando registro:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 /* =========================
-   FRONTEND VITE
+   FRONTEND CONFIG
 ========================= */
 
 const distPath = path.join(__dirname, '../dist');
@@ -158,6 +152,7 @@ app.use((req, res) => {
    START SERVER
 ========================= */
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(PORT, async () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  await initDB();
 });
